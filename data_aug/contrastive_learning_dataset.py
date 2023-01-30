@@ -32,7 +32,11 @@ class ContrastiveLearningDataset:
                                                           transform=ContrastiveLearningViewGenerator(
                                                               self.get_simclr_pipeline_transform(96),
                                                               n_views),
-                                                          download=True)}
+                                                          download=True),
+                          'cell': lambda: datasets.ImageFolder(root="/content/Train_Basophil",
+                                                               transform=ContrastiveLearningViewGenerator(
+                                                                self.get_simclr_pipeline_transform(57),
+                                                                n_views))}
 
         try:
             dataset_fn = valid_datasets[name]
