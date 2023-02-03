@@ -13,6 +13,12 @@ from utils import save_config_file, accuracy, save_checkpoint
 torch.manual_seed(0)
 
 
+def save_to_file(loss_values, file_path):
+    with open(file_path, 'w') as f:
+        for value in loss_values:
+            f.write(f"{value}\n")
+
+
 class SimCLR(object):
 
     def __init__(self, *args, **kwargs):
@@ -81,7 +87,7 @@ class SimCLR(object):
                 self.optimizer.zero_grad()
 
                 scaler.scale(loss).backward()
-                losses.append(loss)
+                losses.append(loss.cpu())
 
                 scaler.step(self.optimizer)
                 scaler.update()
@@ -110,13 +116,6 @@ class SimCLR(object):
             'optimizer': self.optimizer.state_dict(),
         }, is_best=False, filename=os.path.join(self.writer.log_dir, checkpoint_name))
         logging.info(f"Model checkpoint and metadata has been saved at {self.writer.log_dir}.")
-        self.plot_loss(losses)
-
-    def plot_loss(self, loss_values):
-        plt.plot(self, loss_values)
-        plt.xlabel('Training Batches')
-        plt.ylabel('Training Loss')
-        plt.title('Training Losses by Batches')
-        plt.show()
+        save_to_file(losses, "/content/SimCLR/training_losses")
 
 
