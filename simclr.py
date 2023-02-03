@@ -4,6 +4,7 @@ import sys
 
 import torch
 import torch.nn.functional as F
+import matplotlib.pyplot as plt
 from torch.cuda.amp import GradScaler, autocast
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
@@ -65,6 +66,7 @@ class SimCLR(object):
         logging.info(f"Start SimCLR training for {self.args.epochs} epochs.")
         logging.info(f"Training with gpu: {self.args.disable_cuda}.")
 
+        losses = []
         for epoch_counter in range(self.args.epochs):
             for images, _ in tqdm(train_loader):
                 images = torch.cat(images, dim=0)
@@ -79,6 +81,7 @@ class SimCLR(object):
                 self.optimizer.zero_grad()
 
                 scaler.scale(loss).backward()
+                losses.append(loss)
 
                 scaler.step(self.optimizer)
                 scaler.update()
@@ -107,3 +110,13 @@ class SimCLR(object):
             'optimizer': self.optimizer.state_dict(),
         }, is_best=False, filename=os.path.join(self.writer.log_dir, checkpoint_name))
         logging.info(f"Model checkpoint and metadata has been saved at {self.writer.log_dir}.")
+        self.plot_loss(losses)
+
+    def plot_loss(self, loss_values):
+        plt.plot(self, loss_values)
+        plt.xlabel('Training Batches')
+        plt.ylabel('Training Loss')
+        plt.title('Training Losses by Batches')
+        plt.show()
+
+
