@@ -76,7 +76,7 @@ def main():
     model = ResNetSimCLR(base_model=args.arch, out_dim=args.out_dim)
     checkpoint_file = '/content/SimCLR_cell_batch2048_epoch100_checkpoint_0100.pth.tar'
     checkpoint = torch.load(checkpoint_file)
-    model.load_state_dict(checkpoint['model_state_dict'])
+    model.load_state_dict(checkpoint['state_dict'])
 
     optimizer = torch.optim.Adam(model.parameters(), args.lr, weight_decay=args.weight_decay)
 
