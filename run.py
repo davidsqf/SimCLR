@@ -72,7 +72,11 @@ def main():
         train_dataset, batch_size=args.batch_size, shuffle=True,
         num_workers=args.workers, pin_memory=True, drop_last=True)
 
+    # Create the ResNetSimCLR model and load its parameters from the checkpoint file
     model = ResNetSimCLR(base_model=args.arch, out_dim=args.out_dim)
+    checkpoint_file = '/content/SimCLR_cell_batch2048_epoch100_checkpoint_0100.pth.tar'
+    checkpoint = torch.load(checkpoint_file)
+    model.load_state_dict(checkpoint['model_state_dict'])
 
     optimizer = torch.optim.Adam(model.parameters(), args.lr, weight_decay=args.weight_decay)
 
@@ -83,6 +87,7 @@ def main():
     with torch.cuda.device(args.gpu_index):
         simclr = SimCLR(model=model, optimizer=optimizer, scheduler=scheduler, args=args)
         simclr.train(train_loader)
+
 
 
 if __name__ == "__main__":
