@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import os
 import sys
@@ -108,14 +109,13 @@ class SimCLR(object):
 
         logging.info("Training has finished.")
         # save model checkpoints
-        checkpoint_name = 'checkpoint_{:04d}.pth.tar'.format(self.args.epochs)
-        save_checkpoint({
-            'epoch': self.args.epochs,
-            'arch': self.args.arch,
-            'state_dict': self.model.state_dict(),
-            'optimizer': self.optimizer.state_dict(),
-        }, is_best=False, filename=os.path.join(self.writer.log_dir, checkpoint_name))
-        logging.info(f"Model checkpoint and metadata has been saved at {self.writer.log_dir}.")
+        now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        # Define the file path where you want to save the model, with the current date and time
+        file_path = f"model_backbone_{now}.pt"
+
+        # Save the model's state dictionary to the file
+        torch.save(self.model.backbone.state_dict(), file_path)
         save_to_file(losses, "/content/SimCLR/training_losses")
 
 
